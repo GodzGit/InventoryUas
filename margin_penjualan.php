@@ -1,0 +1,59 @@
+<?php include 'db.php'; ?>
+<?php include 'layout/navbar.php'; ?>
+<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"><title>Judul View</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"></head>
+<body class="bg-light">
+<div class="container mt-4">
+  <h4 class="fw-bold text-primary mb-3">📘 Judul View</h4>
+  <div class="mb-3 d-flex gap-2">
+    <a href="margin_penjualan.php" class="btn btn-primary btn-sm">Tampilkan Semua</a>
+    <a href="margin_penjualan.php?filter=aktif" class="btn btn-success btn-sm">Hanya Aktif</a>
+    <a href="margin_penjualan.php?filter=nonaktif" class="btn btn-secondary btn-sm">Hanya Tidak Aktif</a>
+  </div>
+  <div class="card shadow-sm border-0"><div class="card-body table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+      <thead class="table-primary">
+        <tr>
+          <?php
+          $result = mysqli_query($conn, "DESCRIBE v_master_margin_penjualan");
+          while($col = mysqli_fetch_assoc($result)){
+            echo "<th>{$col['Field']}</th>";
+          }
+          ?>
+        </tr>
+      </thead>
+      <tbody>
+      <?php
+      $filter = $_GET['filter'] ?? '';
+
+        // dasar query
+        $sql = "SELECT * FROM v_master_margin_penjualan";
+
+        // tambahkan filter bila ada
+        if($filter == 'aktif'){
+          $sql .= " WHERE status = '✅ Aktif'";
+        } elseif($filter == 'nonaktif'){
+          $sql .= " WHERE status = '❎ Tidak Aktif'";
+        }
+
+        // urutkan agar Aktif muncul duluan
+        $sql .= " ORDER BY status asc";
+
+        // jalankan query
+        $data = mysqli_query($conn, $sql);
+      if(mysqli_num_rows($data)>0){
+        while($row=mysqli_fetch_assoc($data)){
+          echo "<tr>";
+          foreach($row as $v) echo "<td>".htmlspecialchars($v)."</td>";
+          echo "</tr>";
+        }
+      } else echo "<tr><td colspan='10' class='text-center text-muted'>Tidak ada data</td></tr>";
+      ?>
+      </tbody>
+    </table>
+  </div></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body></html>
